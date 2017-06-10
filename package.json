@@ -1,0 +1,30 @@
+{
+  "name": "elmv",
+  "version": "1.0.0",
+  "description": "Run the right elm in the right place.",
+  "main": "index.js",
+  "bin": {
+    "elm-make": "bin.js",
+    "elm-package": "bin.js",
+    "elm-repl": "bin.js",
+    "elm-reactor": "bin.js",
+    "elm-format": "bin.js",
+    "elm-test": "bin.js",
+    "elm": "bin.js"
+  },
+  "author": "Jasper Woudenberg",
+  "license": "ISC",
+  "dependencies": {
+    "minimist": "^1.2.0",
+    "mkdirp": "^0.5.1",
+    "semver": "^5.3.0",
+    "shelljs": "^0.7.8"
+  },
+  "scripts": {
+    "test": "ava"
+  },
+  "devDependencies": {
+    "ava": "^0.19.1",
+    "sinon": "^2.3.4"
+  }
+}
