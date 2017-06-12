@@ -97,6 +97,7 @@ function run(argv, elmvdir = getElmvdir()) {
   var child = cp.spawn(bin, args, {
     stdio: [process.stdin, process.stdout, process.stderr]
   });
+  return child;
 }
 
 exports.run = run;
