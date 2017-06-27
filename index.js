@@ -51,8 +51,8 @@ function findVersion(root, tool) {
   var elmvJson = fs.existsSync(elmvJsonPath) ? require(elmvJsonPath) : {};
   var version = elmvJson[unalias(tool)];
   if (!version) {
-    elmvJson = Object.assign(elmvJsonWithDefaults(), elmvJson);
-    version = elmvJson[unalias(tool)];
+    version = elmvJson[unalias(tool)] = latest(unalias(tool));
+    // Only create an elmv.json if we're in an elm project directory.
     var elmJsonPath = path.join(root, "elm-package.json");
     if (fs.existsSync(elmJsonPath)) {
       fs.writeFileSync(elmvJsonPath, JSON.stringify(elmvJson, null, 2));
@@ -74,14 +74,6 @@ function findBin(elmvdir, tool, version) {
     console.log("Installation complete!");
   }
   return binpath;
-}
-
-function elmvJsonWithDefaults() {
-  return {
-    elm: latest("elm"),
-    "elm-format": latest("elm-format"),
-    "elm-test": latest("elm-test")
-  };
 }
 
 function getElmvdir() {
