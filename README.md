@@ -10,7 +10,7 @@ Run `npm install -g elmv`.
 - If no `elmv.json` exists one will be created with the latest versions of these tools as defaults.
 - Versions will be installed automatically if they aren't already.
 - Outside of elm project directories you will always get the latest available version of each tool.
+- Passing a `--use <version>` string to any of the elm tools will switch the version of that tool and update your elmv.json.
 
 ## TODO:
 - [ ] Pass `elm-format` the right `--elm-version` parameter.
-- [ ] Allow a different version to be set by passing a `--version <version>` to any command.
