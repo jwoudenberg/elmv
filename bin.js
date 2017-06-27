@@ -1,4 +1,7 @@
 #!/usr/bin/env node
 var run = require("./index.js").run;
 
-run(process.argv).on("exit", code => process.exit(code));
+var child = run(process.argv);
+if (child) {
+  child.on("exit", code => process.exit(code));
+}

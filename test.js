@@ -6,6 +6,7 @@ import path from "path";
 import fs from "fs";
 import sinon from "sinon";
 import shell from "shelljs";
+import parseArgs from "minimist";
 
 test("latest", t => {
   var result = elmv.latest("elm");
@@ -24,7 +25,8 @@ Object.keys(activePaths).forEach(cmd =>
     var argv = cmd.split(" ");
     var command = argv[0];
     var args = argv.slice(1);
-    var result = elmv.activePath(command, args);
+    var parsedArgs = parseArgs(args);
+    var result = elmv.activePath(command, parsedArgs);
     t.is(result, activePaths[cmd]);
   })
 );
@@ -96,6 +98,22 @@ test("findBin - tool is already installed", t => {
   var spy = sinon.spy(shell, "exec");
   elmv.findBin(elmvdir, "elm-repl", "0.18.0");
   t.false(spy.called);
+});
+
+test("switchVersion", t => {
+  var root = cleanTestDir();
+  var elmvJsonPath = path.join(root, "elmv.json");
+  var elmJsonPath = path.join(root, "elm-package.json");
+  var versions = {
+    elm: "0.18.0"
+  };
+  fs.writeFileSync(elmvJsonPath, JSON.stringify(versions));
+  fs.writeFileSync(elmJsonPath, "{}");
+  elmv.switchVersion(root, "elm-reactor", "0.17");
+  var newVersions = JSON.parse(
+    fs.readFileSync(elmvJsonPath, { encoding: "utf8" })
+  );
+  t.is(newVersions["elm"], "0.17.1");
 });
 
 test("run", t => {

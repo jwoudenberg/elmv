@@ -17,12 +17,11 @@ function findRoot(startPath) {
 }
 
 function activePath(tool, args) {
-  parsedArgs = parseArgs(args);
   switch (unalias(tool)) {
     case "elm":
-      return parsedArgs._[0] || process.cwd();
+      return args._[0] || process.cwd();
     case "elm-format":
-      return parsedArgs._[0] || process.cwd();
+      return args._[0] || process.cwd();
     case "elm-test":
       return process.cwd();
     default:
@@ -41,9 +40,9 @@ function unalias(tool) {
 }
 
 function latest(tool) {
-  return shell
-    .exec(`npm view ${unalias(tool)}@latest version`, { silent: true })
-    .trim();
+  var cmd = `npm view ${unalias(tool)}@latest version --json`;
+  var res = shell.exec(cmd, { silent: true });
+  return JSON.parse(res);
 }
 
 function findVersion(root, tool) {
@@ -52,11 +51,7 @@ function findVersion(root, tool) {
   var version = elmvJson[unalias(tool)];
   if (!version) {
     version = elmvJson[unalias(tool)] = latest(unalias(tool));
-    // Only create an elmv.json if we're in an elm project directory.
-    var elmJsonPath = path.join(root, "elm-package.json");
-    if (fs.existsSync(elmJsonPath)) {
-      fs.writeFileSync(elmvJsonPath, JSON.stringify(elmvJson, null, 2));
-    }
+    saveElmvJson(root, elmvJson);
   }
   return version;
 }
@@ -80,10 +75,40 @@ function getElmvdir() {
   return path.join(os.homedir(), ".elmv");
 }
 
+function switchVersion(root, tool, dirtyVersion) {
+  var cmd = `npm view ${unalias(tool)}@${dirtyVersion} version --json`;
+  var res = shell.exec(cmd, { silent: true });
+  if (res.trim() === "") {
+    return console.log(`Could not find version ${dirtyVersion} of ${tool}.`);
+  }
+  var versions = JSON.parse(res);
+  var version = versions instanceof Array
+    ? versions[versions.length - 1]
+    : versions;
+  var elmvJsonPath = path.join(root, "elmv.json");
+  var elmvJson = fs.existsSync(elmvJsonPath) ? require(elmvJsonPath) : {};
+  elmvJson[unalias(tool)] = version;
+  saveElmvJson(root, elmvJson);
+  console.log(`Now using ${unalias(tool)} version ${version}`);
+}
+
+function saveElmvJson(root, elmvJson) {
+  // Only create an elmv.json if we're in an elm project directory.
+  var elmJsonPath = path.join(root, "elm-package.json");
+  var elmvJsonPath = path.join(root, "elmv.json");
+  if (fs.existsSync(elmJsonPath)) {
+    fs.writeFileSync(elmvJsonPath, JSON.stringify(elmvJson, null, 2));
+  }
+}
+
 function run(argv, elmvdir = getElmvdir()) {
   var tool = path.basename(argv[1]);
   var args = argv.slice(2);
-  var root = findRoot(activePath(tool, args));
+  var parsedArgs = parseArgs(args);
+  var root = findRoot(activePath(tool, parsedArgs));
+  if (parsedArgs.use) {
+    return switchVersion(root, tool, parsedArgs.use);
+  }
   var version = findVersion(root, tool);
   var bin = findBin(elmvdir, tool, version);
   var child = cp.spawn(bin, args, {
@@ -99,3 +124,4 @@ exports.activePath = activePath;
 exports.findRoot = findRoot;
 exports.findVersion = findVersion;
 exports.findBin = findBin;
+exports.switchVersion = switchVersion;
