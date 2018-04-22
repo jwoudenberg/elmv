@@ -24,6 +24,8 @@ function activePath(tool, args) {
       return args._[0] || process.cwd();
     case "elm-test":
       return process.cwd();
+    case "elm-verify-examples":
+      return process.cwd();
     default:
       throw new Error(`Unknown tool: ${tool}`);
   }

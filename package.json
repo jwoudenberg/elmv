@@ -4,6 +4,7 @@
   "description": "Run the right elm in the right place.",
   "main": "index.js",
   "bin": {
+    "elm-verify-examples": "bin.js",
     "elm-make": "bin.js",
     "elm-package": "bin.js",
     "elm-repl": "bin.js",
