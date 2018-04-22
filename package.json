@@ -1,6 +1,6 @@
 {
   "name": "elmv",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Run the right elm in the right place.",
   "main": "index.js",
   "bin": {
