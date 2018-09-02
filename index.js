@@ -9,8 +9,10 @@ var mkdirp = require("mkdirp");
 function findRoot(startPath) {
   var dir = path.resolve(startPath);
   while (dir !== path.dirname(dir)) {
-    var elmJsonPath = path.join(dir, "elm-package.json");
-    if (fs.existsSync(elmJsonPath)) return dir;
+    var elmPackageJsonPath = path.join(dir, "elm-package.json");
+    var elmJsonPath = path.join(dir, "elm.json");
+    if (fs.existsSync(elmJsonPath) || fs.existsSync(elmPackageJsonPath))
+      return dir;
     dir = path.dirname(dir);
   }
   return process.cwd();

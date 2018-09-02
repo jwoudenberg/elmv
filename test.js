@@ -31,11 +31,20 @@ Object.keys(activePaths).forEach(cmd =>
   })
 );
 
-test("findRoot", t => {
+test("findRoot - elm-package.json", t => {
   var root = "/path/to";
   sinon
     .stub(fs, "existsSync")
     .callsFake(file => file === path.join(root, "elm-package.json"));
+  var result = elmv.findRoot("/path/to/a/deep/sub/directory");
+  t.is(result, root);
+});
+
+test("findRoot - elm.json", t => {
+  var root = "/path/to";
+  sinon
+    .stub(fs, "existsSync")
+    .callsFake(file => file === path.join(root, "elm.json"));
   var result = elmv.findRoot("/path/to/a/deep/sub/directory");
   t.is(result, root);
 });
@@ -119,7 +128,7 @@ test("switchVersion", t => {
 test("run", t => {
   var testdir = cleanTestDir();
   var elmvdir = cleanTestDir();
-  var argv = ["/usr/local/bin/node", "/usr/local/bin/elm-make", "--help"];
+  var argv = ["/usr/local/bin/node", "/usr/local/bin/elm", "--help"];
   shell.cd(testdir);
   t.notThrows(() => elmv.run(argv, elmvdir));
 });
